@@ -1,0 +1,20 @@
+{
+  "theme": "premium",
+  "primaryColor": "#1a365d",
+  "secondaryColor": "#c9a227",
+  "buttonColor": "#c9a227",
+  "textColor": "#1a202c",
+  "bgColor": "#f8f9fa",
+  "cardBgColor": "#ffffff",
+  "languages": [
+    "en",
+    "mr",
+    "hi"
+  ],
+  "defaultLanguage": "en",
+  "festivalTheme": "",
+  "festivalStart": "",
+  "festivalEnd": "",
+  "showStatus": true,
+  "updatedAt": "2026-10-04T07:47:31.266264+00:00"
+}

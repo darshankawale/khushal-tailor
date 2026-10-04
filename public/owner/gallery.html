@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gallery</title>
+  <link rel="stylesheet" href="/css/admin.css">
+  <script src="/owner/auth.js"></script>
+</head>
+<body>
+  <button class="mobile-toggle" id="menu-btn">☰</button>
+  <div class="admin-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand"><span id="side-shop">My Shop</span><small>Owner Panel</small></div>
+      <a href="/owner/dashboard.html">🏠 Dashboard</a>
+      <a href="/owner/about.html">✏️ About</a>
+      <a href="/owner/services.html">✂️ Services</a>
+      <a href="/owner/gallery.html" class="active">📸 Gallery</a>
+      <a href="/owner/contact.html">📍 Contact</a>
+      <a href="/owner/timings.html">🕐 Timings</a>
+      <a href="/owner/themes.html">🎨 Themes</a>
+      <a href="/owner/enquiries.html">📨 Enquiries</a>
+      <a href="/owner/settings.html">⚙️ Settings</a>
+      <a href="/" target="_blank">🌐 View Website</a>
+      <div class="logout"><a href="#" id="logout-btn">🚪 Logout</a></div>
+    </aside>
+    <main class="main">
+      <div class="page-header"><h1>Gallery</h1></div>
+      <div id="msg"></div>
+      <div class="card">
+        <h2>Add Photo</h2>
+        <div class="form-row">
+          <div class="form-group"><label>Photo</label><input type="file" id="file" accept="image/*"></div>
+          <div class="form-group"><label>Category</label>
+            <select id="category">
+              <option>Shop</option><option>Men's</option><option>Women's</option><option>Kids</option>
+              <option>Wedding</option><option>Suit</option><option>Uniform</option><option>Alteration</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group"><label>Caption</label><input id="caption"></div>
+        <button class="btn btn-primary" id="upload-btn">Upload</button>
+      </div>
+      <div class="card">
+        <h2>Photos</h2>
+        <div class="gallery-admin-grid" id="grid"></div>
+      </div>
+    </main>
+  </div>
+  <script>
+    if (!ownerAuth.requireLoginPage()) { /* redirecting */ }
+    document.getElementById('menu-btn').onclick = () => document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('logout-btn').onclick = (e) => { e.preventDefault(); ownerAuth.ownerLogout(); };
+    async function load() {
+      const [shop, gal] = await Promise.all([ownerAuth.ownerFetch('/api/owner/shop'), ownerAuth.ownerFetch('/api/owner/gallery')]);
+      document.getElementById('side-shop').textContent = (await shop.json()).shopName || '';
+      const items = await gal.json();
+      document.getElementById('grid').innerHTML = items.map(i => `
+        <div class="gallery-admin-item">
+          <img src="${i.url}" alt="">
+          <div class="actions">
+            <button class="btn btn-danger btn-sm" onclick="del('${i.id}')">Delete</button>
+          </div>
+        </div>
+      `).join('') || '<p style="color:#718096">No photos yet</p>';
+    }
+    async function del(id) {
+      if (!confirm('Delete this photo?')) return;
+      await ownerAuth.ownerFetch('/api/owner/gallery/' + id, { method: 'DELETE' });
+      load();
+    }
+    document.getElementById('upload-btn').onclick = async () => {
+      const file = document.getElementById('file').files[0];
+      if (!file) return alert('Select a photo');
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('category', document.getElementById('category').value);
+      fd.append('caption', document.getElementById('caption').value);
+      const res = await ownerAuth.ownerFetch('/api/owner/gallery', { method: 'POST', body: fd, credentials: 'same-origin' });
+      const msg = document.getElementById('msg');
+      let data = {};
+      try { data = await res.json(); } catch(e) {}
+      if (res.ok) { msg.innerHTML = '<div class="alert alert-success">Uploaded successfully</div>'; document.getElementById('file').value=''; document.getElementById('caption').value=''; load(); }
+      else if (res.status === 401) { msg.innerHTML = '<div class="alert alert-error">Session expired. Please login again.</div>'; setTimeout(()=>location.href='/owner/login.html',1500); }
+      else { msg.innerHTML = '<div class="alert alert-error">' + (data.error || 'Upload failed. Use JPG/PNG under 5MB.') + '</div>'; }
+    };
+    load();
+  </script>
+</body>
+</html>

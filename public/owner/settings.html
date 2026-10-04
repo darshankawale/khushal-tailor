@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings</title>
+  <link rel="stylesheet" href="/css/admin.css">
+  <script src="/owner/auth.js"></script>
+</head>
+<body>
+  <button class="mobile-toggle" id="menu-btn">☰</button>
+  <div class="admin-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand"><span id="side-shop">My Shop</span><small>Owner Panel</small></div>
+      <a href="/owner/dashboard.html">🏠 Dashboard</a>
+      <a href="/owner/about.html">✏️ About</a>
+      <a href="/owner/services.html">✂️ Services</a>
+      <a href="/owner/gallery.html">📸 Gallery</a>
+      <a href="/owner/contact.html">📍 Contact</a>
+      <a href="/owner/timings.html">🕐 Timings</a>
+      <a href="/owner/themes.html">🎨 Themes</a>
+      <a href="/owner/enquiries.html">📨 Enquiries</a>
+      <a href="/owner/settings.html" class="active">⚙️ Settings</a>
+      <a href="/" target="_blank">🌐 View Website</a>
+      <div class="logout"><a href="#" id="logout-btn">🚪 Logout</a></div>
+    </aside>
+    <main class="main">
+      <div class="page-header"><h1>Settings</h1></div>
+      <div id="msg"></div>
+      <div class="card">
+        <h2>Change Password</h2>
+        <div class="form-group"><label>Current Password</label><input type="password" id="currentPassword"></div>
+        <div class="form-group"><label>New Password</label><input type="password" id="newPassword" minlength="6"></div>
+        <div class="form-group"><label>Confirm New Password</label><input type="password" id="confirmPassword"></div>
+        <button class="btn btn-primary" id="pwd-btn">Update Password</button>
+      </div>
+      <div class="card">
+        <h2>Info</h2>
+        <p style="color:#718096;font-size:0.9rem">
+          Enquiries are stored temporarily and automatically deleted after 7 days.
+          Download PDF or Excel from the Enquiries page to keep a permanent record.
+        </p>
+        <p style="color:#718096;font-size:0.9rem;margin-top:8px">
+          Your website is independent. Changes you make only affect your shop.
+        </p>
+      </div>
+    </main>
+  </div>
+  <script>
+    if (!ownerAuth.requireLoginPage()) { /* redirecting */ }
+    document.getElementById('menu-btn').onclick = () => document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('logout-btn').onclick = (e) => { e.preventDefault(); ownerAuth.ownerLogout(); };
+    ownerAuth.ownerFetch('/api/owner/shop').then(r => r.json()).then(s => {
+      document.getElementById('side-shop').textContent = s.shopName || '';
+    });
+    document.getElementById('pwd-btn').onclick = async () => {
+      const currentPassword = document.getElementById('currentPassword').value;
+      const newPassword = document.getElementById('newPassword').value;
+      const confirm = document.getElementById('confirmPassword').value;
+      if (newPassword !== confirm) {
+        document.getElementById('msg').innerHTML = '<div class="alert alert-error">Passwords do not match</div>';
+        return;
+      }
+      if (newPassword.length < 6) {
+        document.getElementById('msg').innerHTML = '<div class="alert alert-error">Password must be at least 6 characters</div>';
+        return;
+      }
+      const res = await ownerAuth.ownerFetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword, newPassword })
+      });
+      const data = await res.json();
+      document.getElementById('msg').innerHTML = res.ok
+        ? '<div class="alert alert-success">Password updated</div>'
+        : '<div class="alert alert-error">' + (data.error || 'Failed') + '</div>';
+      if (res.ok) {
+        document.getElementById('currentPassword').value = '';
+        document.getElementById('newPassword').value = '';
+        document.getElementById('confirmPassword').value = '';
+      }
+    };
+  </script>
+</body>
+</html>

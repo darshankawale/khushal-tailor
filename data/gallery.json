@@ -1,0 +1,50 @@
+[
+  {
+    "id": "s1",
+    "url": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22400%22%20height%3D%22400%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%231a365d%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%232c5282%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22400%22%20height%3D%22400%22%20fill%3D%22url%28%23g%29%22/%3E%3Ctext%20x%3D%22200%22%20y%3D%22175%22%20text-anchor%3D%22middle%22%20font-size%3D%2264%22%3E%F0%9F%91%94%3C/text%3E%3Ctext%20x%3D%22200%22%20y%3D%22250%22%20text-anchor%3D%22middle%22%20font-size%3D%2220%22%20fill%3D%22%23fff%22%20font-family%3D%22sans-serif%22%3EMen%27s%20Wear%3C/text%3E%3C/svg%3E",
+    "category": "Men's",
+    "caption": "Formal shirts",
+    "order": 1,
+    "createdAt": "2026-10-04T07:47:31.266264+00:00"
+  },
+  {
+    "id": "s2",
+    "url": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22400%22%20height%3D%22400%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23702459%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23b83280%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22400%22%20height%3D%22400%22%20fill%3D%22url%28%23g%29%22/%3E%3Ctext%20x%3D%22200%22%20y%3D%22175%22%20text-anchor%3D%22middle%22%20font-size%3D%2264%22%3E%F0%9F%91%97%3C/text%3E%3Ctext%20x%3D%22200%22%20y%3D%22250%22%20text-anchor%3D%22middle%22%20font-size%3D%2220%22%20fill%3D%22%23fff%22%20font-family%3D%22sans-serif%22%3EWomen%27s%3C/text%3E%3C/svg%3E",
+    "category": "Women's",
+    "caption": "Designer blouse",
+    "order": 2,
+    "createdAt": "2026-10-04T07:47:31.266264+00:00"
+  },
+  {
+    "id": "s3",
+    "url": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22400%22%20height%3D%22400%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23744210%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23c9a227%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22400%22%20height%3D%22400%22%20fill%3D%22url%28%23g%29%22/%3E%3Ctext%20x%3D%22200%22%20y%3D%22175%22%20text-anchor%3D%22middle%22%20font-size%3D%2264%22%3E%F0%9F%92%92%3C/text%3E%3Ctext%20x%3D%22200%22%20y%3D%22250%22%20text-anchor%3D%22middle%22%20font-size%3D%2220%22%20fill%3D%22%23fff%22%20font-family%3D%22sans-serif%22%3EWedding%3C/text%3E%3C/svg%3E",
+    "category": "Wedding",
+    "caption": "Wedding collection",
+    "order": 3,
+    "createdAt": "2026-10-04T07:47:31.266264+00:00"
+  },
+  {
+    "id": "s4",
+    "url": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22400%22%20height%3D%22400%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%231a202c%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%234a5568%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22400%22%20height%3D%22400%22%20fill%3D%22url%28%23g%29%22/%3E%3Ctext%20x%3D%22200%22%20y%3D%22175%22%20text-anchor%3D%22middle%22%20font-size%3D%2264%22%3E%F0%9F%A7%A5%3C/text%3E%3Ctext%20x%3D%22200%22%20y%3D%22250%22%20text-anchor%3D%22middle%22%20font-size%3D%2220%22%20fill%3D%22%23fff%22%20font-family%3D%22sans-serif%22%3ESuit%3C/text%3E%3C/svg%3E",
+    "category": "Suit",
+    "caption": "Premium suits",
+    "order": 4,
+    "createdAt": "2026-10-04T07:47:31.266264+00:00"
+  },
+  {
+    "id": "s5",
+    "url": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22400%22%20height%3D%22400%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23276749%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%2348bb78%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22400%22%20height%3D%22400%22%20fill%3D%22url%28%23g%29%22/%3E%3Ctext%20x%3D%22200%22%20y%3D%22175%22%20text-anchor%3D%22middle%22%20font-size%3D%2264%22%3E%F0%9F%A7%92%3C/text%3E%3Ctext%20x%3D%22200%22%20y%3D%22250%22%20text-anchor%3D%22middle%22%20font-size%3D%2220%22%20fill%3D%22%23fff%22%20font-family%3D%22sans-serif%22%3EKids%3C/text%3E%3C/svg%3E",
+    "category": "Kids",
+    "caption": "Kids wear",
+    "order": 5,
+    "createdAt": "2026-10-04T07:47:31.266264+00:00"
+  },
+  {
+    "id": "s6",
+    "url": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22400%22%20height%3D%22400%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%232b6cb0%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%2363b3ed%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22400%22%20height%3D%22400%22%20fill%3D%22url%28%23g%29%22/%3E%3Ctext%20x%3D%22200%22%20y%3D%22175%22%20text-anchor%3D%22middle%22%20font-size%3D%2264%22%3E%F0%9F%8F%AA%3C/text%3E%3Ctext%20x%3D%22200%22%20y%3D%22250%22%20text-anchor%3D%22middle%22%20font-size%3D%2220%22%20fill%3D%22%23fff%22%20font-family%3D%22sans-serif%22%3EShop%3C/text%3E%3C/svg%3E",
+    "category": "Shop",
+    "caption": "Our shop",
+    "order": 6,
+    "createdAt": "2026-10-04T07:47:31.266264+00:00"
+  }
+]

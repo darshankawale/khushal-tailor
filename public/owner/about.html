@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit About</title>
+  <link rel="stylesheet" href="/css/admin.css">
+  <script src="/owner/auth.js"></script>
+</head>
+<body>
+  <button class="mobile-toggle" id="menu-btn">☰</button>
+  <div class="admin-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand"><span id="side-shop">My Shop</span><small>Owner Panel</small></div>
+      <a href="/owner/dashboard.html">🏠 Dashboard</a>
+      <a href="/owner/about.html" class="active">✏️ About</a>
+      <a href="/owner/services.html">✂️ Services</a>
+      <a href="/owner/gallery.html">📸 Gallery</a>
+      <a href="/owner/contact.html">📍 Contact</a>
+      <a href="/owner/timings.html">🕐 Timings</a>
+      <a href="/owner/themes.html">🎨 Themes</a>
+      <a href="/owner/enquiries.html">📨 Enquiries</a>
+      <a href="/owner/settings.html">⚙️ Settings</a>
+      <a href="/" target="_blank">🌐 View Website</a>
+      <div class="logout"><a href="#" id="logout-btn">🚪 Logout</a></div>
+    </aside>
+    <main class="main">
+      <div class="page-header"><h1>About & Hero</h1></div>
+      <div id="msg"></div>
+      <div class="card">
+        <h2>Hero Section</h2>
+        <div class="form-group"><label>Heading</label><input id="heroHeading"></div>
+        <div class="form-group"><label>Subtitle</label><textarea id="heroSubtitle" rows="2"></textarea></div>
+        <div class="form-group"><label>Hero Image</label><input type="file" id="heroFile" accept="image/*"><img id="heroPreview" style="max-width:200px;margin-top:8px;border-radius:8px;display:none"></div>
+      </div>
+      <div class="card">
+        <h2>About Us</h2>
+        <div class="form-group"><label>Title</label><input id="aboutTitle"></div>
+        <div class="form-group"><label>Description</label><textarea id="aboutText" rows="5"></textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label>Experience</label><input id="experience"></div>
+          <div class="form-group"><label>Speciality</label><input id="speciality"></div>
+        </div>
+        <div class="form-group"><label>Owner Photo</label><input type="file" id="ownerFile" accept="image/*"><img id="ownerPreview" style="max-width:150px;margin-top:8px;border-radius:8px;display:none"></div>
+        <div class="form-group"><label>About Section Image (shop photo)</label><input type="file" id="aboutFile" accept="image/*"><img id="aboutPreview" style="max-width:200px;margin-top:8px;border-radius:8px;display:none"></div>
+        <div class="form-group"><label>Why Choose Us (one per line)</label><textarea id="whyChooseUs" rows="6"></textarea></div>
+      </div>
+      <button class="btn btn-primary" id="save-btn">Save Changes</button>
+    </main>
+  </div>
+  <script>
+    if (!ownerAuth.requireLoginPage()) { /* redirecting */ }
+    document.getElementById('menu-btn').onclick = () => document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('logout-btn').onclick = (e) => { e.preventDefault(); ownerAuth.ownerLogout(); };
+    async function load() {
+      const res = await ownerAuth.ownerFetch('/api/owner/shop');
+      const s = await res.json();
+      document.getElementById('side-shop').textContent = s.shopName || '';
+      document.getElementById('heroHeading').value = s.heroHeading || '';
+      document.getElementById('heroSubtitle').value = s.heroSubtitle || '';
+      document.getElementById('aboutTitle').value = s.aboutTitle || '';
+      document.getElementById('aboutText').value = s.aboutText || '';
+      document.getElementById('experience').value = s.experience || '';
+      document.getElementById('speciality').value = s.speciality || '';
+      document.getElementById('whyChooseUs').value = (s.whyChooseUs || []).join('\n');
+      if (s.heroImage) { const i = document.getElementById('heroPreview'); i.src = s.heroImage; i.style.display = 'block'; }
+      if (s.ownerPhoto) { const i = document.getElementById('ownerPreview'); i.src = s.ownerPhoto; i.style.display = 'block'; }
+      if (s.aboutImage) { const i = document.getElementById('aboutPreview'); i.src = s.aboutImage; i.style.display = 'block'; }
+    }
+    async function doUpload(inputId, url, previewId) {
+      const input = document.getElementById(inputId);
+      if (!input.files || !input.files[0]) return;
+      const fd = new FormData(); fd.append('file', input.files[0]);
+      const msg = document.getElementById('msg');
+      try {
+        const res = await ownerAuth.ownerFetch(url, { method: 'POST', body: fd });
+        const d = await res.json();
+        if (res.ok && d.url) {
+          const i = document.getElementById(previewId);
+          i.src = d.url; i.style.display = 'block';
+          if (msg) msg.innerHTML = '<div class="alert alert-success">Image uploaded</div>';
+        } else if (res.status === 401) {
+          if (msg) msg.innerHTML = '<div class="alert alert-error">Session expired. Login again.</div>';
+          setTimeout(()=>location.href='/owner/login.html',1500);
+        } else {
+          if (msg) msg.innerHTML = '<div class="alert alert-error">' + (d.error || 'Upload failed') + '</div>';
+        }
+      } catch (err) {
+        if (msg) msg.innerHTML = '<div class="alert alert-error">Network error during upload</div>';
+      }
+    }
+    document.getElementById('heroFile').onchange = () => doUpload('heroFile', '/api/owner/upload/hero', 'heroPreview');
+    document.getElementById('ownerFile').onchange = () => doUpload('ownerFile', '/api/owner/upload/owner', 'ownerPreview');
+    document.getElementById('aboutFile').onchange = () => doUpload('aboutFile', '/api/owner/upload/about', 'aboutPreview');
+    document.getElementById('save-btn').onclick = async () => {
+      const body = {
+        heroHeading: document.getElementById('heroHeading').value,
+        heroSubtitle: document.getElementById('heroSubtitle').value,
+        aboutTitle: document.getElementById('aboutTitle').value,
+        aboutText: document.getElementById('aboutText').value,
+        experience: document.getElementById('experience').value,
+        speciality: document.getElementById('speciality').value,
+        whyChooseUs: document.getElementById('whyChooseUs').value.split('\n').map(s => s.trim()).filter(Boolean)
+      };
+      const res = await ownerAuth.ownerFetch('/api/owner/shop', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+      const msg = document.getElementById('msg');
+      if (res.ok) { msg.innerHTML = '<div class="alert alert-success">Saved! <a href="/?t=' + Date.now() + '" target="_blank">Open website</a> to see changes</div>'; }
+      else { msg.innerHTML = '<div class="alert alert-error">Failed to save</div>'; }
+    };
+    load();
+  </script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Owner Login</title>
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <div class="login-page">
+    <div class="login-box">
+      <h1>Owner Login</h1>
+      <p class="sub">Shop Management Portal</p>
+      <div id="error" class="alert alert-error" style="display:none"></div>
+      <form id="login-form">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" name="username" id="username" required autocomplete="username" placeholder="Username">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" name="password" id="password" required autocomplete="current-password" placeholder="Password">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:8px">Login</button>
+      </form>
+      <p style="text-align:center;margin-top:16px;font-size:0.85rem;color:#718096">
+        Or open: <code>/owner</code> or <code>/owner/yourname</code>
+      </p>
+    </div>
+  </div>
+  <script src="/owner/auth.js"></script>
+  <script>
+    // Pre-fill username from URL /owner/somename
+    (function() {
+      const parts = location.pathname.split('/').filter(Boolean);
+      if (parts[0] === 'owner' && parts[1] && parts[1] !== 'login.html') {
+        document.getElementById('username').value = decodeURIComponent(parts[1]);
+      }
+      // Already has saved creds? go dashboard
+      if (window.ownerAuth.isOwnerLoggedIn()) {
+        location.href = '/owner/dashboard.html';
+      }
+    })();
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const errEl = document.getElementById('error');
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          ownerAuth.setOwnerCreds(username, password);
+          location.href = data.redirect || '/owner/dashboard.html';
+        } else {
+          errEl.textContent = data.error || 'Login failed';
+          errEl.style.display = 'block';
+        }
+      } catch {
+        errEl.textContent = 'Network error';
+        errEl.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>

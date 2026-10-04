@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enquiries</title>
+  <link rel="stylesheet" href="/css/admin.css">
+  <script src="/owner/auth.js"></script>
+</head>
+<body>
+  <button class="mobile-toggle" id="menu-btn">☰</button>
+  <div class="admin-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand"><span id="side-shop">My Shop</span><small>Owner Panel</small></div>
+      <a href="/owner/dashboard.html">🏠 Dashboard</a>
+      <a href="/owner/about.html">✏️ About</a>
+      <a href="/owner/services.html">✂️ Services</a>
+      <a href="/owner/gallery.html">📸 Gallery</a>
+      <a href="/owner/contact.html">📍 Contact</a>
+      <a href="/owner/timings.html">🕐 Timings</a>
+      <a href="/owner/themes.html">🎨 Themes</a>
+      <a href="/owner/enquiries.html" class="active">📨 Enquiries</a>
+      <a href="/owner/settings.html">⚙️ Settings</a>
+      <a href="/" target="_blank">🌐 View Website</a>
+      <div class="logout"><a href="#" id="logout-btn">🚪 Logout</a></div>
+    </aside>
+    <main class="main">
+      <div class="page-header">
+        <h1>Enquiries</h1>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-primary btn-sm" id="export-pdf">📄 Download PDF</button>
+          <button class="btn btn-accent btn-sm" id="export-excel">📊 Download Excel</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="form-row">
+          <div class="form-group"><label>Search</label><input id="search" placeholder="Name, mobile, message..."></div>
+          <div class="form-group"><label>From</label><input type="date" id="from"></div>
+          <div class="form-group"><label>To</label><input type="date" id="to"></div>
+        </div>
+        <button class="btn btn-outline btn-sm" id="filter-btn">Filter</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th><input type="checkbox" id="select-all"></th>
+                <th>Date</th>
+                <th>Customer</th>
+                <th>Mobile</th>
+                <th>Service</th>
+                <th>Preferred</th>
+                <th>Message</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <p id="empty" style="text-align:center;color:#718096;display:none;padding:20px">No enquiries yet. They are kept for 7 days.</p>
+      </div>
+    </main>
+  </div>
+  <script>
+    let all = [];
+    document.getElementById('menu-btn').onclick = () => document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('logout-btn').onclick = (e) => { e.preventDefault(); ownerAuth.ownerLogout(); };
+    function selectedIds() {
+      return Array.from(document.querySelectorAll('.row-check:checked')).map(c => c.value);
+    }
+    function render(list) {
+      const tbody = document.getElementById('tbody');
+      document.getElementById('empty').style.display = list.length ? 'none' : 'block';
+      tbody.innerHTML = list.map(e => `
+        <tr>
+          <td><input type="checkbox" class="row-check" value="${e.id}"></td>
+          <td>${new Date(e.createdAt).toLocaleString('en-IN')}</td>
+          <td>${e.name || ''}</td>
+          <td><a href="tel:${e.mobile}">${e.mobile || ''}</a></td>
+          <td>${e.service || '-'}</td>
+          <td>${e.preferredDate || '-'}</td>
+          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis">${e.message || ''}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="del('${e.id}')">Delete</button></td>
+        </tr>
+      `).join('');
+    }
+    async function load() {
+      const params = new URLSearchParams();
+      const q = document.getElementById('search').value;
+      const from = document.getElementById('from').value;
+      const to = document.getElementById('to').value;
+      if (q) params.set('q', q);
+      if (from) params.set('from', from);
+      if (to) params.set('to', to);
+      const [shop, enq] = await Promise.all([
+        ownerAuth.ownerFetch('/api/owner/shop'),
+        ownerAuth.ownerFetch('/api/owner/enquiries?' + params.toString())
+      ]);
+      document.getElementById('side-shop').textContent = (await shop.json()).shopName || '';
+      all = await enq.json();
+      render(all);
+    }
+    async function del(id) {
+      if (!confirm('Delete this enquiry?')) return;
+      await ownerAuth.ownerFetch('/api/owner/enquiries/' + id, { method: 'DELETE' });
+      load();
+    }
+    document.getElementById('filter-btn').onclick = load;
+    document.getElementById('select-all').onchange = (e) => {
+      document.querySelectorAll('.row-check').forEach(c => c.checked = e.target.checked);
+    };
+    document.getElementById('export-pdf').onclick = () => {
+      const ids = selectedIds();
+      let url = '/api/owner/enquiries/export/pdf';
+      if (ids.length) url += '?ids=' + ids.join(',');
+      window.open(url, '_blank');
+    };
+    document.getElementById('export-excel').onclick = () => {
+      const ids = selectedIds();
+      let url = '/api/owner/enquiries/export/excel';
+      if (ids.length) url += '?ids=' + ids.join(',');
+      window.open(url, '_blank');
+    };
+    load();
+  </script>
+</body>
+</html>

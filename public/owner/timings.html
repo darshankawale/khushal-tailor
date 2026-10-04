@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timings</title>
+  <link rel="stylesheet" href="/css/admin.css">
+  <script src="/owner/auth.js"></script>
+</head>
+<body>
+  <button class="mobile-toggle" id="menu-btn">☰</button>
+  <div class="admin-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand"><span id="side-shop">My Shop</span><small>Owner Panel</small></div>
+      <a href="/owner/dashboard.html">🏠 Dashboard</a>
+      <a href="/owner/about.html">✏️ About</a>
+      <a href="/owner/services.html">✂️ Services</a>
+      <a href="/owner/gallery.html">📸 Gallery</a>
+      <a href="/owner/contact.html">📍 Contact</a>
+      <a href="/owner/timings.html" class="active">🕐 Timings</a>
+      <a href="/owner/themes.html">🎨 Themes</a>
+      <a href="/owner/enquiries.html">📨 Enquiries</a>
+      <a href="/owner/settings.html">⚙️ Settings</a>
+      <a href="/" target="_blank">🌐 View Website</a>
+      <div class="logout"><a href="#" id="logout-btn">🚪 Logout</a></div>
+    </aside>
+    <main class="main">
+      <div class="page-header"><h1>Opening Hours & Holiday</h1></div>
+      <div id="msg"></div>
+      <div class="card">
+        <h2>Weekly Timings</h2>
+        <div id="days"></div>
+        <button class="btn btn-primary" id="save-timings" style="margin-top:12px">Save Timings</button>
+      </div>
+      <div class="card">
+        <h2>Temporary Holiday / Closure</h2>
+        <div class="form-group"><label><input type="checkbox" id="hol-active"> Shop is temporarily closed</label></div>
+        <div class="form-group"><label>Reason</label><input id="hol-reason" placeholder="Diwali Holiday"></div>
+        <div class="form-row">
+          <div class="form-group"><label>Close until (date)</label><input type="date" id="hol-until"></div>
+          <div class="form-group"><label>Reopen message</label><input id="hol-reopen" placeholder="05 Nov - 09:00 AM"></div>
+        </div>
+        <button class="btn btn-primary" id="save-holiday">Save Holiday</button>
+      </div>
+    </main>
+  </div>
+  <script>
+    const days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+    const labels = {monday:'Monday',tuesday:'Tuesday',wednesday:'Wednesday',thursday:'Thursday',friday:'Friday',saturday:'Saturday',sunday:'Sunday'};
+    document.getElementById('menu-btn').onclick = () => document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('logout-btn').onclick = (e) => { e.preventDefault(); ownerAuth.ownerLogout(); };
+    function renderDays(timings) {
+      document.getElementById('days').innerHTML = days.map(d => {
+        const t = timings[d] || { open: '09:00', close: '21:00', closed: false };
+        return `<div class="form-row" style="align-items:center">
+          <div style="width:100px;font-weight:600">${labels[d]}</div>
+          <div class="form-group" style="margin:0"><input type="time" id="${d}-open" value="${t.open}"></div>
+          <div class="form-group" style="margin:0"><input type="time" id="${d}-close" value="${t.close}"></div>
+          <label><input type="checkbox" id="${d}-closed" ${t.closed ? 'checked' : ''}> Closed</label>
+        </div>`;
+      }).join('');
+    }
+    async function load() {
+      const [shop, tim, hol] = await Promise.all([
+        ownerAuth.ownerFetch('/api/owner/shop'), ownerAuth.ownerFetch('/api/owner/timings'), ownerAuth.ownerFetch('/api/owner/holiday')
+      ]);
+      document.getElementById('side-shop').textContent = (await shop.json()).shopName || '';
+      renderDays(await tim.json());
+      const h = await hol.json();
+      document.getElementById('hol-active').checked = !!h.active;
+      document.getElementById('hol-reason').value = h.reason || '';
+      document.getElementById('hol-until').value = h.closeUntil ? h.closeUntil.slice(0,10) : '';
+      document.getElementById('hol-reopen').value = h.reopenAt || '';
+    }
+    document.getElementById('save-timings').onclick = async () => {
+      const body = {};
+      days.forEach(d => {
+        body[d] = {
+          open: document.getElementById(d + '-open').value,
+          close: document.getElementById(d + '-close').value,
+          closed: document.getElementById(d + '-closed').checked
+        };
+      });
+      const res = await ownerAuth.ownerFetch('/api/owner/timings', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+      document.getElementById('msg').innerHTML = res.ok ? '<div class="alert alert-success">Timings saved</div>' : '<div class="alert alert-error">Failed</div>';
+    };
+    document.getElementById('save-holiday').onclick = async () => {
+      const body = {
+        active: document.getElementById('hol-active').checked,
+        reason: document.getElementById('hol-reason').value,
+        closeUntil: document.getElementById('hol-until').value,
+        reopenAt: document.getElementById('hol-reopen').value
+      };
+      const res = await ownerAuth.ownerFetch('/api/owner/holiday', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+      document.getElementById('msg').innerHTML = res.ok ? '<div class="alert alert-success">Holiday saved</div>' : '<div class="alert alert-error">Failed</div>';
+    };
+    load();
+  </script>
+</body>
+</html>

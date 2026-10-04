@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Owner Dashboard</title>
+  <link rel="stylesheet" href="/css/admin.css">
+  <script src="/owner/auth.js"></script>
+</head>
+<body>
+  <button class="mobile-toggle" id="menu-btn">☰</button>
+  <div class="admin-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <span id="side-shop">My Shop</span>
+        <small>Owner Panel</small>
+      </div>
+      <a href="/owner/dashboard.html" class="active">🏠 Dashboard</a>
+      <a href="/owner/about.html">✏️ About</a>
+      <a href="/owner/services.html">✂️ Services</a>
+      <a href="/owner/gallery.html">📸 Gallery</a>
+      <a href="/owner/contact.html">📍 Contact</a>
+      <a href="/owner/timings.html">🕐 Timings</a>
+      <a href="/owner/themes.html">🎨 Themes</a>
+      <a href="/owner/enquiries.html">📨 Enquiries</a>
+      <a href="/owner/settings.html">⚙️ Settings</a>
+      <a href="/" target="_blank">🌐 View Website</a>
+      <div class="logout">
+        <a href="#" id="logout-btn">🚪 Logout</a>
+      </div>
+    </aside>
+    <main class="main">
+      <div class="page-header">
+        <h1>Dashboard</h1>
+        <span id="live-badge" class="btn btn-sm btn-outline">🟢 Website Live</span>
+      </div>
+      <div class="stats-row" id="stats">
+        <div class="stat-card"><div class="num" id="stat-enquiries">0</div><div class="label">Enquiries</div></div>
+        <div class="stat-card"><div class="num" id="stat-services">0</div><div class="label">Services</div></div>
+        <div class="stat-card"><div class="num" id="stat-gallery">0</div><div class="label">Gallery Photos</div></div>
+        <div class="stat-card"><div class="num" id="stat-status">—</div><div class="label">Shop Status</div></div>
+      </div>
+      <div class="card">
+        <h2>Quick Actions</h2>
+        <div style="display:flex;flex-wrap:wrap;gap:10px">
+          <a href="/owner/about.html" class="btn btn-primary">Edit About</a>
+          <a href="/owner/gallery.html" class="btn btn-primary">Add Photo</a>
+          <a href="/owner/services.html" class="btn btn-primary">Edit Services</a>
+          <a href="/owner/timings.html" class="btn btn-primary">Opening Hours</a>
+          <a href="/owner/themes.html" class="btn btn-accent">Change Theme</a>
+          <a href="/owner/enquiries.html" class="btn btn-outline">View Enquiries</a>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Website Preview — See how customers view your site</h2>
+        <p style="color:#718096;font-size:0.9rem;margin-bottom:12px">Switch device to check Mobile, Tablet and Desktop layout.</p>
+        <div class="device-switch" id="device-switch">
+          <button type="button" class="device-btn active" data-w="375" data-label="Mobile">📱 Mobile</button>
+          <button type="button" class="device-btn" data-w="768" data-label="Tablet">📲 Tablet</button>
+          <button type="button" class="device-btn" data-w="1100" data-label="Desktop">💻 Desktop</button>
+          <a href="/" target="_blank" class="btn btn-outline btn-sm" style="margin-left:auto">Open full site ↗</a>
+        </div>
+        <div class="preview-wrap">
+          <div class="preview-frame" id="preview-frame" style="width:375px">
+            <iframe id="preview-iframe" src="/" title="Preview"></iframe>
+          </div>
+        </div>
+        <p id="preview-label" style="text-align:center;color:#718096;font-size:0.85rem;margin-top:10px">Viewing: Mobile (375px)</p>
+      </div>
+    </main>
+  </div>
+  <script>
+    if (!ownerAuth.requireLoginPage()) { /* redirecting */ }
+    document.getElementById('menu-btn').onclick = () => document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('logout-btn').onclick = (e) => {
+      e.preventDefault();
+      ownerAuth.ownerLogout();
+    };
+
+    // Device preview switcher
+    const frame = document.getElementById('preview-frame');
+    const label = document.getElementById('preview-label');
+    document.querySelectorAll('.device-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.device-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const w = btn.dataset.w;
+        frame.style.width = w + 'px';
+        label.textContent = 'Viewing: ' + btn.dataset.label + ' (' + w + 'px)';
+      });
+    });
+
+    async function load() {
+      const [shopRes, enqRes, statusRes] = await Promise.all([
+        fetch('/api/shop'),
+        ownerAuth.ownerFetch('/api/owner/enquiries'),
+        fetch('/api/status')
+      ]);
+      const data = await shopRes.json();
+      document.getElementById('side-shop').textContent = data.shop.shopName || 'My Shop';
+      document.getElementById('stat-services').textContent = (data.services || []).length;
+      document.getElementById('stat-gallery').textContent = (data.gallery || []).length;
+      if (enqRes.ok) {
+        const enqs = await enqRes.json();
+        document.getElementById('stat-enquiries').textContent = enqs.length;
+      }
+      if (statusRes.ok) {
+        const st = await statusRes.json();
+        document.getElementById('stat-status').textContent = st.isOpen ? 'Open' : 'Closed';
+      }
+    }
+    load();
+  </script>
+</body>
+</html>

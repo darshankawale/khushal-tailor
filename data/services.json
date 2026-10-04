@@ -1,0 +1,56 @@
+[
+  {
+    "id": "1",
+    "name": "Shirt Stitching",
+    "description": "Custom fitted formal & casual shirts",
+    "price": "From ₹400",
+    "icon": "👔",
+    "image": "",
+    "order": 1
+  },
+  {
+    "id": "2",
+    "name": "Blouse Stitching",
+    "description": "Designer & traditional blouses",
+    "price": "From ₹500",
+    "icon": "👗",
+    "image": "",
+    "order": 2
+  },
+  {
+    "id": "3",
+    "name": "Suit / Blazer",
+    "description": "Premium suits and blazers",
+    "price": "From ₹2500",
+    "icon": "🧥",
+    "image": "",
+    "order": 3
+  },
+  {
+    "id": "4",
+    "name": "Kurta / Pathani",
+    "description": "Stylish kurtas for all occasions",
+    "price": "From ₹600",
+    "icon": "🥻",
+    "image": "",
+    "order": 4
+  },
+  {
+    "id": "5",
+    "name": "Ladies Dress",
+    "description": "Custom dresses and gowns",
+    "price": "From ₹800",
+    "icon": "👚",
+    "image": "",
+    "order": 5
+  },
+  {
+    "id": "6",
+    "name": "Alteration",
+    "description": "Quick and neat alterations",
+    "price": "From ₹100",
+    "icon": "✂️",
+    "image": "",
+    "order": 6
+  }
+]

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Themes</title>
+  <link rel="stylesheet" href="/css/admin.css">
+  <script src="/owner/auth.js"></script>
+</head>
+<body>
+  <button class="mobile-toggle" id="menu-btn">☰</button>
+  <div class="admin-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand"><span id="side-shop">My Shop</span><small>Owner Panel</small></div>
+      <a href="/owner/dashboard.html">🏠 Dashboard</a>
+      <a href="/owner/about.html">✏️ About</a>
+      <a href="/owner/services.html">✂️ Services</a>
+      <a href="/owner/gallery.html">📸 Gallery</a>
+      <a href="/owner/contact.html">📍 Contact</a>
+      <a href="/owner/timings.html">🕐 Timings</a>
+      <a href="/owner/themes.html" class="active">🎨 Themes</a>
+      <a href="/owner/enquiries.html">📨 Enquiries</a>
+      <a href="/owner/settings.html">⚙️ Settings</a>
+      <a href="/" target="_blank">🌐 View Website</a>
+      <div class="logout"><a href="#" id="logout-btn">🚪 Logout</a></div>
+    </aside>
+    <main class="main">
+      <div class="page-header"><h1>Themes & Languages</h1></div>
+      <div id="msg"></div>
+      <div class="card">
+        <h2>Website Theme</h2>
+        <div class="form-group">
+          <label>Theme</label>
+          <select id="theme">
+            <option value="normal">Normal (Clean)</option>
+            <option value="dark">Dark</option>
+            <option value="premium">Premium / Shiny</option>
+            <option value="custom">Custom Colours</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Primary Colour</label><input type="color" id="primaryColor" value="#1a365d"></div>
+          <div class="form-group"><label>Secondary Colour</label><input type="color" id="secondaryColor" value="#c9a227"></div>
+          <div class="form-group"><label>Button Colour</label><input type="color" id="buttonColor" value="#c9a227"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Text Colour</label><input type="color" id="textColor" value="#1a202c"></div>
+          <div class="form-group"><label>Background Colour</label><input type="color" id="bgColor" value="#f8f9fa"></div>
+          <div class="form-group"><label>Card Background</label><input type="color" id="cardBgColor" value="#ffffff"></div>
+        </div>
+        <p style="font-size:0.85rem;color:#718096">Text / Background / Card colours apply when Theme = Custom.</p>
+      </div>
+      <div class="card">
+        <h2>Festival Theme</h2>
+        <div class="form-group">
+          <label>Festival</label>
+          <select id="festivalTheme">
+            <option value="">None</option>
+            <option value="diwali">🪔 Diwali</option>
+            <option value="holi">🌈 Holi</option>
+            <option value="ganesh">🐘 Ganesh Chaturthi</option>
+            <option value="christmas">🎄 Christmas</option>
+            <option value="newyear">🎉 New Year</option>
+            <option value="independence">🇮🇳 Independence Day</option>
+            <option value="republic">🇮🇳 Republic Day</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Start Date</label><input type="date" id="festivalStart"></div>
+          <div class="form-group"><label>End Date</label><input type="date" id="festivalEnd"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Languages</h2>
+        <div class="form-group">
+          <label><input type="checkbox" id="lang-en" value="en"> English</label><br>
+          <label><input type="checkbox" id="lang-mr" value="mr"> मराठी (Marathi)</label><br>
+          <label><input type="checkbox" id="lang-hi" value="hi"> हिन्दी (Hindi)</label>
+        </div>
+        <div class="form-group">
+          <label>Default Language</label>
+          <select id="defaultLanguage">
+            <option value="en">English</option>
+            <option value="mr">Marathi</option>
+            <option value="hi">Hindi</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label><input type="checkbox" id="showStatus"> Show Open/Closed status on website</label>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="save-btn">Save Settings</button>
+    </main>
+  </div>
+  <script>
+    if (!ownerAuth.requireLoginPage()) { /* redirecting */ }
+    document.getElementById('menu-btn').onclick = () => document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('logout-btn').onclick = (e) => { e.preventDefault(); ownerAuth.ownerLogout(); };
+    async function load() {
+      const [shop, set] = await Promise.all([ownerAuth.ownerFetch('/api/owner/shop'), ownerAuth.ownerFetch('/api/owner/settings')]);
+      document.getElementById('side-shop').textContent = (await shop.json()).shopName || '';
+      const s = await set.json();
+      document.getElementById('theme').value = s.theme || 'premium';
+      document.getElementById('primaryColor').value = s.primaryColor || '#1a365d';
+      document.getElementById('secondaryColor').value = s.secondaryColor || '#c9a227';
+      document.getElementById('buttonColor').value = s.buttonColor || '#c9a227';
+      document.getElementById('textColor').value = s.textColor || '#1a202c';
+      document.getElementById('bgColor').value = s.bgColor || '#f8f9fa';
+      document.getElementById('cardBgColor').value = s.cardBgColor || '#ffffff';
+      document.getElementById('festivalTheme').value = s.festivalTheme || '';
+      document.getElementById('festivalStart').value = s.festivalStart ? s.festivalStart.slice(0,10) : '';
+      document.getElementById('festivalEnd').value = s.festivalEnd ? s.festivalEnd.slice(0,10) : '';
+      document.getElementById('defaultLanguage').value = s.defaultLanguage || 'en';
+      document.getElementById('showStatus').checked = s.showStatus !== false;
+      (s.languages || ['en']).forEach(l => {
+        const el = document.getElementById('lang-' + l);
+        if (el) el.checked = true;
+      });
+    }
+    document.getElementById('save-btn').onclick = async () => {
+      const langs = [];
+      if (document.getElementById('lang-en').checked) langs.push('en');
+      if (document.getElementById('lang-mr').checked) langs.push('mr');
+      if (document.getElementById('lang-hi').checked) langs.push('hi');
+      const body = {
+        theme: document.getElementById('theme').value,
+        primaryColor: document.getElementById('primaryColor').value,
+        secondaryColor: document.getElementById('secondaryColor').value,
+        buttonColor: document.getElementById('buttonColor').value,
+        textColor: document.getElementById('textColor').value,
+        bgColor: document.getElementById('bgColor').value,
+        cardBgColor: document.getElementById('cardBgColor').value,
+        festivalTheme: document.getElementById('festivalTheme').value,
+        festivalStart: document.getElementById('festivalStart').value,
+        festivalEnd: document.getElementById('festivalEnd').value,
+        languages: langs.length ? langs : ['en'],
+        defaultLanguage: document.getElementById('defaultLanguage').value,
+        showStatus: document.getElementById('showStatus').checked
+      };
+      const res = await ownerAuth.ownerFetch('/api/owner/settings', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+      document.getElementById('msg').innerHTML = res.ok ? '<div class="alert alert-success">Saved! <a href="/?t=' + Date.now() + '" target="_blank">Open website</a></div>' : '<div class="alert alert-error">Failed — check login</div>';
+    };
+    load();
+  </script>
+</body>
+</html>

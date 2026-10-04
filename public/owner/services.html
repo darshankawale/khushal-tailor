@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Services</title>
+  <link rel="stylesheet" href="/css/admin.css">
+  <script src="/owner/auth.js"></script>
+</head>
+<body>
+  <button class="mobile-toggle" id="menu-btn">☰</button>
+  <div class="admin-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand"><span id="side-shop">My Shop</span><small>Owner Panel</small></div>
+      <a href="/owner/dashboard.html">🏠 Dashboard</a>
+      <a href="/owner/about.html">✏️ About</a>
+      <a href="/owner/services.html" class="active">✂️ Services</a>
+      <a href="/owner/gallery.html">📸 Gallery</a>
+      <a href="/owner/contact.html">📍 Contact</a>
+      <a href="/owner/timings.html">🕐 Timings</a>
+      <a href="/owner/themes.html">🎨 Themes</a>
+      <a href="/owner/enquiries.html">📨 Enquiries</a>
+      <a href="/owner/settings.html">⚙️ Settings</a>
+      <a href="/" target="_blank">🌐 View Website</a>
+      <div class="logout"><a href="#" id="logout-btn">🚪 Logout</a></div>
+    </aside>
+    <main class="main">
+      <div class="page-header">
+        <h1>Services</h1>
+        <button class="btn btn-primary" id="add-btn">+ Add Service</button>
+      </div>
+      <div id="msg"></div>
+      <div id="list"></div>
+      <button class="btn btn-primary" id="save-btn" style="margin-top:16px">Save All</button>
+    </main>
+  </div>
+  <script>
+    let services = [];
+    document.getElementById('menu-btn').onclick = () => document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('logout-btn').onclick = (e) => { e.preventDefault(); ownerAuth.ownerLogout(); };
+    function render() {
+      const list = document.getElementById('list');
+      list.innerHTML = services.map((s, i) => `
+        <div class="card" data-i="${i}">
+          <div class="form-row">
+            <div class="form-group"><label>Name</label><input value="${s.name || ''}" data-f="name"></div>
+            <div class="form-group"><label>Price</label><input value="${s.price || ''}" data-f="price"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Icon (emoji)</label><input value="${s.icon || ''}" data-f="icon" maxlength="4"></div>
+            <div class="form-group"><label>Description</label><input value="${s.description || ''}" data-f="description"></div>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="remove(${i})">Delete</button>
+        </div>
+      `).join('');
+      list.querySelectorAll('input').forEach(inp => {
+        inp.addEventListener('change', () => {
+          const i = +inp.closest('[data-i]').dataset.i;
+          services[i][inp.dataset.f] = inp.value;
+        });
+      });
+    }
+    function remove(i) { services.splice(i, 1); render(); }
+    document.getElementById('add-btn').onclick = () => {
+      services.push({ id: Date.now().toString(), name: 'New Service', description: '', price: '', icon: '✂️', order: services.length + 1 });
+      render();
+    };
+    document.getElementById('save-btn').onclick = async () => {
+      const res = await ownerAuth.ownerFetch('/api/owner/services', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(services) });
+      document.getElementById('msg').innerHTML = res.ok ? '<div class="alert alert-success">Saved! <a href="/?t=' + Date.now() + '" target="_blank">Open website</a></div>' : '<div class="alert alert-error">Failed — check login</div>';
+    };
+    async function load() {
+      const [shop, svc] = await Promise.all([ownerAuth.ownerFetch('/api/owner/shop'), ownerAuth.ownerFetch('/api/owner/services')]);
+      const s = await shop.json();
+      document.getElementById('side-shop').textContent = s.shopName || '';
+      services = await svc.json();
+      render();
+    }
+    load();
+  </script>
+</body>
+</html>

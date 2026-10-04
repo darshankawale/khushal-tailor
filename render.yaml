@@ -1,0 +1,25 @@
+# Optional Render Blueprint
+# Create one service per shop and override env vars in the dashboard.
+services:
+  - type: web
+    name: tailor-shop
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: OWNER_USERNAME
+        value: owner
+      - key: OWNER_PASSWORD
+        value: ChangeMe123!
+      - key: SHOP_NAME
+        value: My Tailors
+      - key: DATA_PATH
+        value: /data
+    disk:
+      name: tailor-data
+      mountPath: /data
+      sizeGB: 1
